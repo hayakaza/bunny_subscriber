@@ -8,10 +8,11 @@ module BunnySubscriber
 
     def subscribe(consumer)
       queue = create_queue(consumer)
+      arguments = subscribe_arguments(consumer)
       @queue_consummer = queue.subscribe(
         manual_ack: true,
         block: false,
-        arguments: subscribe_arguments
+        arguments: arguments
       ) do |delivery_info, properties, payload|
         consumer.event_process_around_action(
           delivery_info, properties, payload
