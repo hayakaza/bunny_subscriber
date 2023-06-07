@@ -45,7 +45,7 @@ module BunnySubscriber
       )
     end
 
-    def subscribe_arguments
+    def subscribe_arguments(consumer)
       args = {}
 
       if (timeout = consumer.subscriber_options[:timeout])
