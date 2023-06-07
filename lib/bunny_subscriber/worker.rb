@@ -19,6 +19,7 @@ module BunnySubscriber
     end
 
     def stop
+      logger.info "++++++++Stopping Worker......."
       unless @stop_flag.set?
         @consumer_instances.each(&:stop)
         @conn.close

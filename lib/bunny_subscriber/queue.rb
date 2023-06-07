@@ -38,6 +38,10 @@ module BunnySubscriber
         options[:arguments] = { 'x-dead-letter-exchange': dl_exchange }
       end
 
+      if (timeout = consumer.subscriber_options[:timeout])
+        options[:arguments] = { 'x-consumer-timeout': timeout }
+      end
+
       channel.queue(
         consumer.subscriber_options[:queue_name], options
       )
