@@ -8,10 +8,10 @@ module BunnySubscriber
       channel_options = Configuration.instance.channel_options
       bunny_connection
       @conn.start
-      channel = @conn.create_channel
-      channel.prefetch(channel_options[:qos])
 
       @consumer_instances = consumers.map do |consumer|
+        channel = @conn.create_channel
+        channel.prefetch(channel_options[:qos])
         consumer_instance = consumer.new(channel, logger)
         consumer_instance.start
         consumer_instance
