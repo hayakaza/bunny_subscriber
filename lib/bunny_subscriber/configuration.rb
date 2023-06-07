@@ -5,6 +5,7 @@ module BunnySubscriber
   BUNNY_OPTION_KEYS = %i[host port user pass vhost heartbeat].freeze
   SERVER_OPTION_KEYS = %i[workers daemonize logger_path pid_path].freeze
   CONSUMER_OPTION_KEYS = %i[consumer_classes boot_path].freeze
+  CHANNEL_OPTION_KEYS =  %i[qos].freeze
 
   def self.configure(options)
     Configuration.instance.options = options
@@ -15,6 +16,7 @@ module BunnySubscriber
 
     attr_accessor :bunny_options, :server_options, :consumer_options
     attr_accessor :environment
+    attr_accessor :channel_options
 
     def initialize
       @environment = ENV['RAILS_ENV'] || 'development'
@@ -24,6 +26,7 @@ module BunnySubscriber
       subset_options(:bunny_options, options, BUNNY_OPTION_KEYS)
       subset_options(:server_options, options, SERVER_OPTION_KEYS)
       subset_options(:consumer_options, options, CONSUMER_OPTION_KEYS)
+      subset_options(:channel_options, options, CHANNEL_OPTION_KEYS)
     end
 
     private
@@ -58,6 +61,12 @@ module BunnySubscriber
       {
         boot_path: 'config/environment.rb',
         consumer_classes: ::BunnySubscriber::Consumer::CLASSES
+      }
+    end
+
+    def default_channel_options
+      {
+        qos: 1
       }
     end
   end
