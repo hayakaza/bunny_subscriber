@@ -10,7 +10,8 @@ module BunnySubscriber
       queue = create_queue(consumer)
       @queue_consummer = queue.subscribe(
         manual_ack: true,
-        block: false
+        block: false,
+        arguments: subscribe_arguments
       ) do |delivery_info, properties, payload|
         consumer.event_process_around_action(
           delivery_info, properties, payload
@@ -38,17 +39,23 @@ module BunnySubscriber
         options[:arguments] = { 'x-dead-letter-exchange': dl_exchange }
       end
 
-      if (timeout = consumer.subscriber_options[:timeout])
-        options[:arguments] = { 'x-consumer-timeout': timeout }
-      end
-
-      if (priority = consumer.subscriber_options[:priority])
-        options[:arguments] = { 'x-priority': priority }
-      end
-
       channel.queue(
         consumer.subscriber_options[:queue_name], options
       )
+    end
+
+    def subscribe_arguments
+      args = {}
+
+      if (timeout = consumer.subscriber_options[:timeout])
+        args['x-consumer-timeout'] = timeout
+      end
+
+      if (priority = consumer.subscriber_options[:priority])
+        args['x-priority'] = priority
+      end
+
+      args
     end
   end
 end
