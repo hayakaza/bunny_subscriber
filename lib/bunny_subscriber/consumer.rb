@@ -22,6 +22,7 @@ module BunnySubscriber
     attr_reader :queue, :channel
 
     def initialize(channel, logger)
+      channel.prefetch(channel_options[:qos])
       @channel = channel
       @logger = logger
       @queue = Queue.new(channel)
@@ -52,15 +53,34 @@ module BunnySubscriber
         "done: #{Time.now - time} s"
       channel.acknowledge(delivery_info.delivery_tag, false)
     rescue StandardError => _e
-      channel.reject(delivery_info.delivery_tag) if use_dead_letter_exchange?
+      reject_message(delivery_info.delivery_tag)
     end
 
     def use_dead_letter_exchange?
-      !subscriber_options[:dead_letter_exchange].nil?
+      !subscriber_options[:dead_letter_exchange].nil? || true
     end
 
     def subscriber_options
       self.class.subscriber_options_hash
+    end
+
+    def channel_options
+      @channel_options ||= Configuration.instance.channel_options
+    end
+
+    def rebuild_customer
+      @channel =  channel.connection.create_channel
+      channel.prefetch(channel_options[:qos])
+      @queue = Queue.new(channel)
+      start
+    end
+
+    def reject_message(delivery_tag)
+      begin
+        channel.reject(delivery_tag, true)
+      rescue Bunny::ChannelAlreadyClosed
+        rebuild_customer
+      end
     end
   end
 end
