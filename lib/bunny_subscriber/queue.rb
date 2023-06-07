@@ -42,6 +42,10 @@ module BunnySubscriber
         options[:arguments] = { 'x-consumer-timeout': timeout }
       end
 
+      if (priority = consumer.subscriber_options[:priority])
+        options[:arguments] = { 'x-priority': priority }
+      end
+
       channel.queue(
         consumer.subscriber_options[:queue_name], options
       )
