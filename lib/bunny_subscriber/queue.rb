@@ -39,6 +39,11 @@ module BunnySubscriber
       if (dl_exchange = consumer.subscriber_options[:dead_letter_exchange])
         options[:arguments] = { 'x-dead-letter-exchange': dl_exchange }
       end
+      
+      if consumer.subscriber_options[:quorum]
+        options[:arguments] = { 'x-queue-type': true }
+      end
+
 
       channel.queue(
         consumer.subscriber_options[:queue_name], options
