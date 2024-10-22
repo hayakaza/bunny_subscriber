@@ -41,7 +41,7 @@ module BunnySubscriber
       end
       
       if consumer.subscriber_options[:quorum]
-        options[:arguments] = { 'x-queue-type': true }
+        options[:arguments] = { 'x-queue-type' => 'quorum' }
       end
 
 
